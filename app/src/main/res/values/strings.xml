@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Continue Watch</string>
+    <string name="app_name1">Continue Watch with Threads</string>
+    <string name="app_name2">Continue Watch with Executors</string>
+    <string name="app_name3">Continue Watch with Coroutines</string>
+    <string name="sec_elapsed">Seconds elapsed: %1$d</string>
+</resources>
