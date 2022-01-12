@@ -7,9 +7,7 @@ import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 // Улучшена точность подсчета времени за счет использования системного таймера (System.currentTimeMillis())
 class MainActivity3_2 : AppCompatActivity() {
@@ -22,18 +20,22 @@ class MainActivity3_2 : AppCompatActivity() {
     private lateinit var job : Job
 
     private fun startCoroutine() {
-        job = lifecycleScope.launch {
+        job = CoroutineScope(Dispatchers.Default).launch {
             Log.d("MainActivity", "coroutine launched")
-            while (true) {
-                Log.d("MainActivity", "coroutine is working (${Thread.currentThread()})")
-                if (secondsElapsed != getSecondsElapsed()) {
-                    secondsElapsed = getSecondsElapsed()
-                    textSecondsElapsed.post {
-                        textSecondsElapsed.text =
-                            getString(R.string.sec_elapsed, secondsElapsed)
+            try {
+                while (true) {
+                    Log.d("MainActivity", "coroutine is working (${Thread.currentThread()})")
+                    if (secondsElapsed != getSecondsElapsed()) {
+                        secondsElapsed = getSecondsElapsed()
+                        withContext(Dispatchers.Main) { // Передача значения в UI-поток
+                            textSecondsElapsed.text = getString(R.string.sec_elapsed, secondsElapsed)
+                        }
                     }
+                    delay(50)
                 }
-                delay(50)
+            }
+            catch (e: InterruptedException) {
+                Log.d("MainActivity", "coroutine is interrupted (${Thread.currentThread()}")
             }
         }
     }

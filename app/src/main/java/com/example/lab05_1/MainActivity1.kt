@@ -17,7 +17,7 @@ class MainActivity1 : AppCompatActivity() {
     private fun startThread() {
        backgroundThread = Thread {
             try {
-                while (true) {
+                while (!Thread.interrupted()) {
                     Log.d("MainActivity", "background thread is working (${Thread.currentThread()})")
                     textSecondsElapsed.post {
                         textSecondsElapsed.text = getString(R.string.sec_elapsed, secondsElapsed++)
@@ -32,7 +32,7 @@ class MainActivity1 : AppCompatActivity() {
     }
 
     private fun stopThread() {
-        backgroundThread.interrupt() // Доказать поток через //
+        backgroundThread.interrupt()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

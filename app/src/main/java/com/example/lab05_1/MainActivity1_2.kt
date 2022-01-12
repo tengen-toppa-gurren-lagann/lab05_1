@@ -20,7 +20,7 @@ class MainActivity1_2 : AppCompatActivity() {
     private fun startThread() {
        backgroundThread = Thread {
             try {
-                while (true) {
+                while (!Thread.interrupted()) {
                     Log.d("MainActivity", "background thread is working (${Thread.currentThread()})")
                     if (secondsElapsed != getSecondsElapsed()) {
                         secondsElapsed = getSecondsElapsed()

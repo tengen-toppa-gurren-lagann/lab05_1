@@ -1,5 +1,6 @@
 package com.example.lab05_1
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -10,23 +11,32 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
+class MyApp : Application() {
+    val executorService : ExecutorService = Executors.newSingleThreadExecutor()
+}
+
 class MainActivity2 : AppCompatActivity() {
     private var secondsElapsed: Int = 0
     private lateinit var textSecondsElapsed: TextView
     private lateinit var sharedPref: SharedPreferences
     private val sharedPrefName = "SEC"
-    private var executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private lateinit var executor: ExecutorService
     private lateinit var task: Future<*>
 
     private fun startExecution() {
-        Log.d("MainActivity", "execution launched")
         task = executor.submit {
-            while(true) {
-                Log.d("MainActivity", "execution is working (${Thread.currentThread()})")
-                textSecondsElapsed.post {
-                    textSecondsElapsed.text = getString(R.string.sec_elapsed, secondsElapsed++)
+            Log.d("MainActivity", "execution launched")
+            try {
+                while (!executor.isShutdown) {
+                    Log.d("MainActivity", "execution is working (${Thread.currentThread()})")
+                    textSecondsElapsed.post {
+                        textSecondsElapsed.text = getString(R.string.sec_elapsed, secondsElapsed++)
+                    }
+                    Thread.sleep(1000)
                 }
-                Thread.sleep(1000)
+            }
+            catch (e: InterruptedException) {
+                Log.d("MainActivity", "execution is interrupted (${Thread.currentThread()})")
             }
         }
     }
@@ -45,6 +55,8 @@ class MainActivity2 : AppCompatActivity() {
 
         textSecondsElapsed = findViewById(R.id.textSecondsElapsed)
         sharedPref = getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+
+        executor = (application as MyApp).executorService
     }
 
     override fun onResume() {

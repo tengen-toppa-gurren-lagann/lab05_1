@@ -1,5 +1,6 @@
 package com.example.lab05_1
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -18,13 +19,13 @@ class MainActivity2_2 : AppCompatActivity() {
     private lateinit var textSecondsElapsed: TextView
     private lateinit var sharedPref: SharedPreferences
     private val sharedPrefName = "SEC"
-    private var executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private lateinit var executor: ExecutorService
     private lateinit var task: Future<*>
 
     private fun startExecution() {
-        Log.d("MainActivity", "execution launched")
         task = executor.submit {
-            while(true) {
+            Log.d("MainActivity", "execution launched")
+            while (!executor.isShutdown) {
                 Log.d("MainActivity", "execution is running (${Thread.currentThread()})")
                 if (secondsElapsed != getSecondsElapsed()) {
                     secondsElapsed = getSecondsElapsed()
@@ -56,6 +57,8 @@ class MainActivity2_2 : AppCompatActivity() {
 
         textSecondsElapsed = findViewById(R.id.textSecondsElapsed)
         sharedPref = getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+
+        executor = (application as MyApp).executorService
     }
 
     override fun onStart() {
